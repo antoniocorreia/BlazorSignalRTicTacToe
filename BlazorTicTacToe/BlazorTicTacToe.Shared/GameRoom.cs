@@ -20,7 +20,7 @@
             {
                 Game.PlayerXId = newPlayer.ConnectionId;
             }
-            else
+            else if (Players.Count == 2)
             {
                 Game.PlayerOId = newPlayer.ConnectionId;
             }

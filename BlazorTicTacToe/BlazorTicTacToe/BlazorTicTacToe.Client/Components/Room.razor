@@ -6,9 +6,59 @@
     {
         <h4>Waiting for another player to join...</h4>
     }
+
+    if (!CurrentRoom.Game.GameStarted && CurrentRoom.Game.PlayerXId != myPlayerId && CurrentRoom.Players.Count == 2)
+    {
+        <h4>Game is about to start. Waiting for the other player to start the game.</h4>
+    } 
+
+    if (CurrentRoom.Game.GameOver && !CurrentRoom.Game.IsDraw)
+    {
+        <h4>Game over! Winner: @CurrentRoom.Game.Winner</h4>
+    }
+
+    if (CurrentRoom.Game.GameOver && CurrentRoom.Game.IsDraw)
+    {
+        <h4>Game over! Draw!</h4>
+    }
+
+    if ((!CurrentRoom.Game.GameStarted || CurrentRoom.Game.GameOver)
+        && CurrentRoom.Game.PlayerXId == myPlayerId
+        && CurrentRoom.Players.Count == 2)
+    {
+        <button @onclick="StartGame">Start Game</button>
+    }
+
+    if (CurrentRoom.Game.GameStarted)
+    {
+        <h4>It's @CurrentRoom.Game.CurrentPlayerSymbol's turn</h4>
+        <span>Currently playing: @CurrentRoom.Players[0].Name (X) , @CurrentRoom.Players[1].Name (O)</span>
+
+        <table class="tic-tac-toe">
+            @for (int row = 0; row < 3; row++)
+            {
+                <tr>
+                    @for(int col = 0; col < 3; col++)
+                    {
+                        var r = row;
+                        var c = col;
+                        <td @onclick="() => MakeMove(r,c)">
+                            @CurrentRoom.Game.Board[r][c]
+                        </td>
+                    }
+                </tr>
+            }
+        </table>
+
+        @if(!IsMyTurn() && !CurrentRoom.Game.GameOver)
+        {
+            <h4>Waiting for the other player to make a move...</h4>
+        }
+    }
 }
 
 @code {
+    private string? myPlayerId;
     [CascadingParameter]
     public HubConnection? HubConnection { get; set; }
     [Parameter]
@@ -21,11 +71,44 @@
             return;
         }
 
+        myPlayerId = HubConnection.ConnectionId;
+
         HubConnection.On<Player>("PlayerJoined", (player) =>
         {
             Console.WriteLine($"Player joined: {player.Name}");
             CurrentRoom.Players.Add(player);
             StateHasChanged();
         });
+
+        HubConnection.On<GameRoom>("UpdateGame", serverRoom =>
+        {
+            CurrentRoom = serverRoom;
+            StateHasChanged();
+        });
+    }
+
+    async Task StartGame()
+    {
+        if (HubConnection is null || CurrentRoom is null)
+        {
+            return;
+        }
+
+        await HubConnection.InvokeAsync("StartGame", CurrentRoom.RoomId);
+    }
+
+    private async Task MakeMove(int row, int col)
+    {
+        
+    }
+
+    private bool IsMyTurn()
+    {
+        if (CurrentRoom is null || CurrentRoom.Game is null)
+        {
+            return false;
+        }
+
+        return CurrentRoom.Game.CurrentPlayerId == myPlayerId;
     }
 }

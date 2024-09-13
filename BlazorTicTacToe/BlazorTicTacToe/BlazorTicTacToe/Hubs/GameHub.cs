@@ -9,7 +9,7 @@ namespace BlazorTicTacToe.Hubs
         public override async Task OnConnectedAsync()
         {
             Console.WriteLine($"Player with Id '{Context.ConnectionId}' connected.");
-            
+
             await Clients.Caller.SendAsync("Rooms", _rooms.OrderBy(r => r.RoomName));
         }
 
@@ -43,8 +43,19 @@ namespace BlazorTicTacToe.Hubs
                     return room;
                 }
             }
-            
+
             return null;
+        }
+
+        public async Task StartGame(string roomId)
+        {
+            var room = _rooms.FirstOrDefault(r => r.RoomId == roomId);
+
+            if (room is not null)
+            {
+                room.Game.StartGame();
+                await Clients.Group(roomId).SendAsync("UpdateGame", room);
+            }
         }
     }
 }

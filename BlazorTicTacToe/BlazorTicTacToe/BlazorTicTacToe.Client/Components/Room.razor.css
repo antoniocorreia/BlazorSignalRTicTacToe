@@ -1,0 +1,9 @@
+.tic-tac-toe td{
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    font-size: 2em;
+    cursor: pointer;
+    vertical-align: middle;
+    border: 1px solid black;
+}
