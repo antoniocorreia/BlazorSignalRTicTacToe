@@ -57,5 +57,23 @@ namespace BlazorTicTacToe.Hubs
                 await Clients.Group(roomId).SendAsync("UpdateGame", room);
             }
         }
+
+        public async Task MakeMove(string roomId, int row, int col, string playerId)
+        {
+            var room = _rooms.FirstOrDefault(r => r.RoomId == roomId);
+
+            if (room is not null && room.Game.MakeMove(row, col, playerId))
+            {
+                room.Game.Winner = room.Game.CheckWinner();
+                room.Game.IsDraw = room.Game.CheckDraw() && string.IsNullOrEmpty(room.Game.Winner);
+
+                if (!string.IsNullOrEmpty(room.Game.Winner) || room.Game.IsDraw)
+                {
+                    room.Game.GameOver = true;
+                }
+
+                await Clients.Group(roomId).SendAsync("UpdateGame", room);
+            }
+        }
     }
 }

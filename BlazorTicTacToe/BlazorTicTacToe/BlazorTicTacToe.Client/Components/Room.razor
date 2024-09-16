@@ -26,7 +26,7 @@
         && CurrentRoom.Game.PlayerXId == myPlayerId
         && CurrentRoom.Players.Count == 2)
     {
-        <button @onclick="StartGame">Start Game</button>
+        <button @onclick="StartGame" class="btn btn-primary">Start Game</button>
     }
 
     if (CurrentRoom.Game.GameStarted)
@@ -99,7 +99,18 @@
 
     private async Task MakeMove(int row, int col)
     {
-        
+        if (IsMyTurn() 
+            && CurrentRoom is not null
+            && CurrentRoom.Game.GameStarted
+            && !CurrentRoom.Game.GameOver
+            && HubConnection is not null)
+        {
+            await HubConnection.InvokeAsync("MakeMove", 
+                CurrentRoom.RoomId, 
+                row, 
+                col,
+                myPlayerId);
+        }
     }
 
     private bool IsMyTurn()

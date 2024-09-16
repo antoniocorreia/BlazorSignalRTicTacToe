@@ -1,1 +1,19 @@
-﻿
+﻿.form-group{
+    margin-bottom:20px !important;
+}
+
+h3{
+    margin-bottom:30px;
+    margin-top: 30px;
+}
+ul{
+    text-align:left;
+}
+
+ul li{
+    margin: 10px;
+}
+
+ul button{
+    margin-left: 10px;
+}

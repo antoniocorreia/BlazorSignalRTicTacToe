@@ -1,5 +1,12 @@
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: #201f6f;
+    color: #b7b7b7;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    text-align:center;
+    padding: 50px;
 }
 
 a, .btn-link {
